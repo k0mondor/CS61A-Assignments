@@ -13,6 +13,12 @@ def shuffle(s):
     """
     assert len(s) % 2 == 0, 'len(seq) must be even'
     "*** YOUR CODE HERE ***"
+    mid = len(s) // 2
+    shuffled = []
+    for i in range(mid):
+        shuffled.append(s[i])
+        shuffled.append(s[i+mid])
+    return shuffled
 
 
 def deep_map(f, s):
@@ -38,20 +44,34 @@ def deep_map(f, s):
     True
     """
     "*** YOUR CODE HERE ***"
+    for i in range(len(s)):
+        if type(s[i]) == list:
+            deep_map(f, s[i])
+        else:
+            s[i] = f(s[i]) 
+    
+
 
 
 HW_SOURCE_FILE=__file__
 
+### Mobile and Tree classes
+### 相当于在planet() mass()实现最底层的直接对数据结构的操作 ，其他函数都是在这个基础上进行抽象的操作
+### 其他函数不直接操作数据结构，而是通过planet mass等函数来操作数据结构，这样就形成了抽象层次，方便后续修改数据结构而不影响其他函数的实现
+### Abstraction Barrier
 
 def planet(mass):
     """Construct a planet of some mass."""
+    ## 断言语句 assert <条件>, <报错时的提示信息>
     assert mass > 0
     "*** YOUR CODE HERE ***"
+    return ['planet', mass]
 
 def mass(p):
     """Select the mass of a planet."""
     assert is_planet(p), 'must call mass on a planet'
     "*** YOUR CODE HERE ***"
+    return p[1]
 
 def is_planet(p):
     """Whether p is a planet."""
@@ -104,6 +124,14 @@ def balanced(m):
     True
     """
     "*** YOUR CODE HERE ***"
+    if is_planet(m):
+        return True
+    else:
+        leftArm = left(m)
+        rightArm = right(m)
+        leftMass = total_mass(end(leftArm))
+        rightMass = total_mass(end(rightArm))
+        return leftMass * length(leftArm) == rightMass * length(rightArm) and balanced(end(leftArm)) and balanced(end(rightArm))
 
 
 def berry_finder(t):
@@ -124,6 +152,12 @@ def berry_finder(t):
     True
     """
     "*** YOUR CODE HERE ***"
+    if label(t) == 'berry':
+        return True
+    for b in branches(t):
+        if berry_finder(b):
+            return True
+    return False
 
 
 HW_SOURCE_FILE=__file__
@@ -139,6 +173,11 @@ def max_path_sum(t):
     17
     """
     "*** YOUR CODE HERE ***"
+    if is_leaf(t):
+        return label(t)
+    else:
+        return label(t) + max([max_path_sum(b) for b in branches(t)])
+    
 
 
 def mobile(left, right):
