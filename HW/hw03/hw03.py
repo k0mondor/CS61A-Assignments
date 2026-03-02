@@ -25,6 +25,8 @@ def num_eights(n):
     True
     """
     "*** YOUR CODE HERE ***"
+    
+    return 0 if n == 0 else (1 if n%10 == 8 else 0) + num_eights(n//10)
 
 
 def digit_distance(n):
@@ -47,6 +49,10 @@ def digit_distance(n):
     True
     """
     "*** YOUR CODE HERE ***"
+    if n<10:
+        return 0
+    else:
+        return abs(n%10-(n//10)%10) + digit_distance(n//10)
 
 
 def interleaved_sum(n, odd_func, even_func):
@@ -71,7 +77,14 @@ def interleaved_sum(n, odd_func, even_func):
     True
     """
     "*** YOUR CODE HERE ***"
-
+    def helper(i,cur_func,next_func):
+        if i > n:
+            return 0
+        else:
+            return cur_func(i) + helper(i+1,next_func,cur_func)
+        
+    return helper(1, odd_func, even_func)
+    
 
 def next_smaller_dollar(bill):
     """Returns the next smaller bill in order."""
@@ -107,6 +120,19 @@ def count_dollars(total):
     True
     """
     "*** YOUR CODE HERE ***"
+    # bill 当前考虑的最大面值 total 还剩多少金额需要凑
+    def helper(total,bill):
+        if total == 0:
+            return 1
+        elif total < 0:
+            return 0
+        elif bill == 1:
+            return 1
+        else:
+            return helper(total, next_smaller_dollar(bill)) + helper(total - bill, bill)
+
+    return helper(total,100)
+            
 
 
 def next_larger_dollar(bill):
@@ -143,6 +169,18 @@ def count_dollars_upward(total):
     True
     """
     "*** YOUR CODE HERE ***"
+    # bill 当前考虑的最小面值 total 还剩多少金额需要凑
+    def helper(amount, bill):
+        if amount == 0: # 刚好凑出金额 记为一个解
+            return 1
+        if bill is None or bill > 100:  # 超出最大面额
+            return 0
+        if bill > amount:
+            return helper(amount, next_larger_dollar(bill))
+        # 使用当前面额 + 跳过当前面额
+        return helper(amount - bill, bill) + helper(amount, next_larger_dollar(bill))
+    
+    return helper(total, 1)   # 从最小面额1开始
 
 
 def print_move(origin, destination):
@@ -176,12 +214,23 @@ def move_stack(n, start, end):
     Move the top disk from rod 2 to rod 3
     Move the top disk from rod 1 to rod 3
     """
+
+    # assert 条件, "错误信息" 当条件不满足时，抛出异常，并显示错误信息
     assert 1 <= start <= 3 and 1 <= end <= 3 and start != end, "Bad start/end"
     "*** YOUR CODE HERE ***"
+    if n == 1:
+        print_move(start, end)
+    else:
+        other = 6 - start - end
+        move_stack(n-1, start, other)
+        print_move(start, end)
+        move_stack(n-1, other, end) 
 
 
 from operator import sub, mul
 
+
+# 高阶函数自己调用自己，称为匿名递归
 def make_anonymous_factorial():
     """Return the value of an expression that computes factorial.
 
@@ -193,5 +242,6 @@ def make_anonymous_factorial():
     ...     ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr', 'FunctionDef', 'Recursion'])
     True
     """
-    return 'YOUR_EXPRESSION_HERE'
+    return (lambda f: f(f))(lambda f: lambda n: 1 if n == 0 else mul(n, f(f)(n-1)))
+
 
