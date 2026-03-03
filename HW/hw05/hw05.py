@@ -10,6 +10,18 @@ def hailstone(n):
     1
     """
     "*** YOUR CODE HERE ***"
+    """生成器不会一次性生成所有值，而是每次需要时才计算下一个值，因此非常适合处理无限序列或大数据流，可以显著节省内存"""
+    """每次 yield 后，函数的所有局部变量和执行位置都会被“冻结”，下次调用 next() 时恢复状态继续执行。"""
+    currnet = n
+    while True:
+        yield currnet
+        if currnet == 1:
+            continue
+        elif currnet % 2 == 0:
+            currnet = currnet // 2
+        else:
+            currnet = 3 * currnet + 1 
+    
 
 
 def merge(a, b):
@@ -31,10 +43,16 @@ def merge(a, b):
     while True:
         if a_val == b_val:
             "*** YOUR CODE HERE ***"
+            yield a_val
+            a_val, b_val = next(a), next(b)
         elif a_val < b_val:
             "*** YOUR CODE HERE ***"
+            yield a_val
+            a_val = next(a)
         else:
             "*** YOUR CODE HERE ***"
+            yield b_val
+            b_val = next(b)
 
 
 def stair_ways(n):
@@ -51,6 +69,16 @@ def stair_ways(n):
     []
     """
     "*** YOUR CODE HERE ***"
+    if n == 0:
+        yield []
+    elif n == 1:
+        yield [1]
+    else:
+        for way in stair_ways(n - 1):
+            yield [1] + way
+        for way in stair_ways(n - 2):
+            yield [2] + way
+
 
 
 def yield_paths(t, value):
@@ -89,10 +117,10 @@ def yield_paths(t, value):
     [[0, 2], [0, 2, 1, 2]]
     """
     if label(t) == value:
-        yield ____
+        yield [label(t)]
     for b in branches(t):
-        for ____ in ____:
-            yield ____
+        for path in yield_paths(b, value):
+            yield [label(t)] + path
 
 
 
