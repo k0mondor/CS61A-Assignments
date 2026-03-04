@@ -9,7 +9,7 @@ def midsem_survey(p):
     import hashlib
     return hashlib.sha224(p.encode('utf-8')).hexdigest()
 
-
+# 不需要在类（Class）的顶部提前声明成员变量 在init方法中直接使用self.成员变量名动态绑定，第一次被赋值时自动创建
 class VendingMachine:
     """A vending machine that vends some product for some price.
 
@@ -47,16 +47,25 @@ class VendingMachine:
     >>> w.vend()
     'Here is your soda.'
     """
+    # 类似于this指针 必须显性写出 指向当前实例对象的引用
     def __init__(self, product, price):
         """Set the product and its price, as well as other instance attributes."""
         "*** YOUR CODE HERE ***"
-
+        self.product = product
+        self.price = price
+        self.stock=0;
+        self.balance=0;# 记录当前投入的钱
+    
     def restock(self, n):
         """Add n to the stock and return a message about the updated stock level.
 
         E.g., Current candy stock: 3
         """
         "*** YOUR CODE HERE ***"
+
+        self.stock+=n
+        return 'Current '+self.product+' stock: '+str(self.stock)# str()
+        # 也可以用f-string return f'Current {self.product} stock: {self.stock}' 直接转换成字符串
 
     def add_funds(self, n):
         """If the machine is out of stock, return a message informing the user to restock
@@ -69,6 +78,11 @@ class VendingMachine:
         E.g., Current balance: $4
         """
         "*** YOUR CODE HERE ***"
+        if self.stock==0:
+            return 'Nothing left to vend. Please restock. Here is your $'+str(n)+'.'
+        else:
+            self.balance+=n
+            return 'Current balance: $'+str(self.balance)
 
     def vend(self):
         """Dispense the product if there is sufficient stock and funds and
@@ -82,6 +96,20 @@ class VendingMachine:
               Please add $3 more funds.
         """
         "*** YOUR CODE HERE ***"
+        if self.stock !=0:
+            if self.balance>=self.price:
+                change=self.balance-self.price
+                self.stock-=1
+                self.balance=0
+                if change!=0:
+                    return 'Here is your '+self.product+' and $'+str(change)+' change.'
+                else:
+                    return 'Here is your '+self.product+'.'
+            else:
+                return 'Please add $'+str(self.price-self.balance)+' more funds.'
+        else:
+            return 'Nothing left to vend. Please restock.'
+
 
 
 def store_digits(n):
@@ -104,6 +132,15 @@ def store_digits(n):
     >>> print("Do not use str or reversed!") if any([r in cleaned for r in ["str", "reversed"]]) else None
     """
     "*** YOUR CODE HERE ***"
+    if n<10:
+        return Link(n)
+    else:
+        restLink=store_digits(n//10)
+        p=restLink
+        while p.rest!=Link.empty:
+            p=p.rest
+        p.rest=Link(n%10)
+        return restLink
 
 
 def deep_map_mut(func, s):
@@ -126,6 +163,13 @@ def deep_map_mut(func, s):
     <9 <16> 25 36>
     """
     "*** YOUR CODE HERE ***"
+    if isinstance(s.first, Link):
+        # isinstance(object, classinfo) chack if the object argument is an instance of the classinfo argument, or of a (direct, indirect, or virtual) subclass thereof. Return True if it is, False otherwise.
+        deep_map_mut(func, s.first)
+    s.first = func(s.first)
+    if s.rest != Link.empty:
+        deep_map_mut(func, s.rest)
+
 
 
 def two_list(vals, counts):
@@ -147,6 +191,14 @@ def two_list(vals, counts):
     Link(1, Link(1, Link(3, Link(3, Link(2)))))
     """
     "*** YOUR CODE HERE ***"
+    if len(vals)==0:
+        return Link.empty
+    else:
+        restLink=two_list(vals[1:], counts[1:])
+        # 想象在 C 语言里：new_node->next = res; res = new_node;
+        for i in range(counts[0]):
+            restLink=Link(vals[0], restLink)
+        return restLink
 
 
 class Link:
